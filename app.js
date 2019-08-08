@@ -1,77 +1,76 @@
 const express = require('express');
 const app = express();
 const bodyParser = require('body-parser');
-var courses = require('./data/courses.json');
+let courses = require('./data/courses.json');
 
 app.set('view engine', 'pug');
-
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(express.static(__dirname + '/public'));
-app.use(express.static(__dirname + '/node_modules/bootstrap/dist'));
+app.use(express.static( __dirname + '/public' ));
+app.use(express.static( __dirname + '/node_modules/bootstrap/dist' ));
 
-app.get('/', function (req, res) {
-    res.render('index', { title: 'API' });
+app.get('/', (req, res) => {
+  res.render('index', {title: 'API'});
 });
 
-app.get('/api/courses', function (req, res) {
-    res.render('courses', {
-        title: 'API Курсы',
-        courses: courses
-    });
+app.get('/courses', (req, res) => {
+  res.render('courses', {
+    title: 'Api Курсы',
+    courses: courses
+  });
 });
 
-app.get('/api/courses/add', function (req, res) {
-    res.render('add');
+app.get('/courses/add', (req, res) => {
+  res.render('add');
 });
 
-app.post('/api/courses/add', function (req, res) {
-    var course = {
-        name = req.body.name,
-        id: Date.now()
-    };
-    courses.push(course);
-    res.redirect('/api/courses');
+app.post('/courses/add', (req, res) => {
+  let course = {
+    name: req.body.name,
+    id: Date.now()
+  };
+
+  courses.push(course);
+
+  res.redirect('/courses');
+});
+
+app.get('/courses/edit/:id', (req, res) => {
+  let course = courses.find( (course) => {
+    return course.id === parseInt(req.params.id);
+  })
+
+  if(!course) {
+    res.sendStatus(404);
+    return;
+  }
+
+  res.render('edit', { course: course });
 });
 
 
+app.post('/courses/edit/:id', (req, res) => {
+  let course = courses.find( (course) => {
+    return course.id === parseInt(req.params.id);
+  })
 
-app.get('/api/courses/edit/:id', function (req, res) {
-    var course = course.find(function (course) {
-        return course.id === parseInt(req.params.id);
-    });
+  if(!course) {
+    res.sendStatus(404);
+    return;
+  }
 
-    if (!course) {
-        res.sendStatus(404);
-        return;
-    }
+  course.name = req.body.name;
 
-    res.render('edit', { course: course });
+  res.redirect('/courses');
 });
 
-app.post('/api/courses/edit/:id', function (req, res) {
+app.get('/courses/delete/:id', (req, res) => {
+  courses = courses.filter( (course) => {
+    return course.id !== parseInt(req.params.id);
+  })
 
-    var course = courses.find(function (course) {
-        return course.id === parseInt(req.params.id);
-    });
-    if (!course) {
-        res.sendStatus(404);
-        return;
-    }
-
-    course.name = req.body.name;
-
-    res.redirect('/api/courses');
+  res.redirect('/courses');
 });
 
-app.get('/api/courses/delete/:id', function (req, res) {
-
-    courses = courses.filter(function (course) {
-        return course.id !== parseInt(req.params.id);
-    });
-
-    res.redirect('/api/courses');
-});
-
-app.listen(3000, function () {
-    console.log('App is listening at localhost:3000');
-});
+app.listen(3000, () => {
+  console.log('app listening at localhost:3000');
+})
