@@ -1,0 +1,21 @@
+extends layout
+
+block content 
+    h1 Все курсы Академии
+    a.btn.btn-primary(href="/api/courses/add") Создать новый курс
+    table.table.table-striped
+        thead
+            tr
+                th ID Курса
+                th Курс
+                th
+                th
+        tbody
+            each course in courses
+                tr
+                    td= course.id
+                    td= course.name
+                    td(style="width: 50px;"): a(href="/api/courses/edit" + course.id)
+                        span.glyphicon-pencil
+                    td(style="width: 50px;"): a(href="/api/courses/delete" + course.id)
+                        span.glyphicon-remove
